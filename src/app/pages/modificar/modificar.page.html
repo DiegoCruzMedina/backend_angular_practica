@@ -1,0 +1,20 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>modificar</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-item>
+    <ion-input label="Titulo de la noticia" labelPlacement="floating" 
+    placeholder="Ingrese un titulo" [(ngModel)]="noticiaRecibida.titulo"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input label="texto de la noticia" labelPlacement="floating" 
+    placeholder="Ingrese un texto" [(ngModel)]="noticiaRecibida.texto"></ion-input>
+  </ion-item>
+
+  <ion-button fill="outline" (click)="modificar()">Outline</ion-button>
+  <ion-button [routerLink]="['/listar']">Default</ion-button>
+</ion-content>

@@ -59,11 +59,12 @@ export class ServicebdService {
         this.database = db;
         //llamar a la funcion de creacion de tablas
         this.crearTablas();
+        this.consultarNoticias();
         //modificar el observable del status de la base de datos
         this.isDBReady.next(true);
 
-      }).catch((error:any)=>{
-        this.presentAlert("Creacion de BD", "Error creando la BD: " + JSON.stringify(error));
+      }).catch((e)=>{
+        this.presentAlert("Creacion de BD", "Error creando la BD: " + JSON.stringify(e));
       })
     })
   }
@@ -80,4 +81,56 @@ export class ServicebdService {
       this.presentAlert("Creacion de tabla", "Error creando las tbalas: " + JSON.stringify(error));
     }
   }
+
+  //FUNCION PARA HACER UN SELECT 
+  consultarNoticias(){
+    return this.database.executeSql('SELECT * FROM noticia',[]).then(respuesta=>{
+      //variable para almacenar el resultado de la consulta
+      let items: Noticias[] = [];
+      //verificar si tenemos registros en la consulta
+      if(respuesta.rows.length > 0){
+        //recorro el resultado
+        for(var i = 0; i <respuesta.rows.length; i++){
+          items.push({
+            idnoticia: respuesta.rows.item(i).idnoticia,
+            titulo: respuesta.rows.item(i).titulo,
+            texto: respuesta.rows.item(i).texto,
+          })
+        }
+      }
+      this.listadoNoticias.next(items as any)
+
+    })
+  }
+
+  modificarNoticia(id:string, titulo:string, texto: string){
+    //SIGNO ? intecambio por un valor de programacion
+    return this.database.executeSql('UPDATE noticia SET titulo = ?, texto = ? WHERE idnoticia = ?',
+    [titulo, texto, id]).then(res=>{
+      this.presentAlert("Modificar","Noticia Modificada Correctamente");
+      this.consultarNoticias();
+    }).catch(e=>{
+      this.presentAlert("Modificacion noticia", "Error al modificar " + JSON.stringify(e));
+    })
+
+  }
+
+  eliminarNoticia(id:string){
+    return this.database.executeSql('DELETE FROM noticia WHERE idnoticia= ?',[id]).then(res=>{
+      this.presentAlert("Eliminar","Noticia eliminada");
+      this.consultarNoticias();
+    }).catch(e=>{
+      this.presentAlert("Eliminar", "Error al eliminar " + JSON.stringify(e));
+    })
+  }
+
+  agregarNoticia(titulo: string, texto: string){
+    return this.database.executeSql('INSERT INTO noticias(titulo,texto) VALUES (?,?)',[titulo,texto]).then(res=>{
+      this.presentAlert("Agregar","Se agrego bien la noticia");
+      this.consultarNoticias();
+    }).catch(e=>{
+      this.presentAlert("Agregar", "Error al insertar " + JSON.stringify(e));
+    })
+  }
+
 }
